@@ -1,24 +1,31 @@
-请用浏览器打开
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>微信跳转浏览器</title>
+</head>
+<body>
+    <script>
+        // 判断是否为微信浏览器
+        function isWeChatBrowser() {
+            var userAgent = navigator.userAgent.toLowerCase();
+            return userAgent.indexOf('micromessenger') !== -1;
+        }
 
-
-  
-  
-  
-    const url = document.location.toString();
-    const urlParmStr = url.slice(url.indexOf('=') + 1);
-    if (is_weixn_qq()) {
-      document.getElementById("tips").innerHTML = "请在浏览器打开本页面";
-    } else {
-      // 不是微信客户端，直接可以访问链接
-      location.href = urlParmStr;
-    }
-    // 判断QQUA的代码无需修改
-    function is_weixn_qq() {
-      const ua = navigator.userAgent.toLowerCase();
-      if (ua.match(/MicroMessenger/i) == "micromessenger") {
-        return "weixin";
-      } else if (ua.match(/QQ/i) == "qq") {
-        return "QQ";
-      }
-      return false;
-    }
+        // 微信环境下执行跳转逻辑
+        if (isWeChatBrowser()) {
+            // 提示用户在浏览器中打开（微信内无法直接跳转，需引导用户手动操作）
+            alert('请点击右上角菜单，选择"在浏览器中打开"以访问完整内容');
+            
+            // 若需自动尝试跳转（部分场景可能生效，视微信版本限制）
+            // 可尝试通过打开一个新链接触发跳转提示
+            // setTimeout(function() {
+            //     window.location.href = '你的目标链接';
+            // }, 1000);
+        } else {
+            // 非微信环境，正常加载页面
+            console.log('非微信浏览器，正常访问');
+        }
+    </script>
+</body>
+</html>
