@@ -7,7 +7,7 @@
   <meta content="320" name="MobileOptimized">
   <title></title>
 <style>
-/* 保留原有的动画样式，确保加载效果正常 */
+/* 保留原有的加载动画样式 */
 .container {
   width: 100px;
   height: 100px;
@@ -87,57 +87,23 @@ function isWeChatBrowser() {
   return navigator.userAgent.toLowerCase().indexOf('micromessenger') !== -1;
 }
 
-// 检测当前环境是否支持iframe加载目标链接
-function checkIframeSupport(targetUrl, callback) {
-  var testIframe = document.createElement('iframe');
-  testIframe.style.display = 'none';
-  testIframe.src = targetUrl;
-  
-  // 监听加载成功/失败事件
-  testIframe.onload = function() {
-    document.body.removeChild(testIframe);
-    callback(true); // 加载成功，支持iframe
-  };
-  
-  testIframe.onerror = function() {
-    document.body.removeChild(testIframe);
-    callback(false); // 加载失败，不支持iframe
-  };
-  
-  document.body.appendChild(testIframe);
-}
-
-// 主逻辑
+// 解析链接参数
 var urlParams = new URLSearchParams(window.location.search);
 var encodedParam = urlParams.get('c');
 var tureurl = encodedParam ? atob(encodedParam) : '';
 
 if (tureurl.includes("http")) {
   if (isWeChatBrowser()) {
-    // 微信环境：先检测iframe支持性
-    checkIframeSupport(tureurl, function(supported) {
-      if (supported) {
-        // 支持iframe，正常加载
-        setTimeout(function() {
-          document.querySelector('.container').style.display = 'none';
-        }, 1500);
-        var html = '<iframe class="content" onload="bindMouseWhee(this)" src="' + tureurl + '"></iframe>';
-        document.writeln(html);
-        console.log('微信环境支持iframe，加载链接：' + tureurl);
-      } else {
-        // 不支持iframe，引导跳转浏览器
-        alert('当前链接在微信内无法正常显示，请点击右上角"..."，选择"在浏览器中打开"');
-        console.log('微信环境不支持iframe，需跳转浏览器');
-      }
-    });
+    // 微信环境：提示跳转浏览器，用户操作后会在浏览器中打开原链接
+    alert('请点击右上角"..."，选择"在浏览器中打开"以访问链接');
+    console.log('微信环境，需跳转浏览器打开原链接：' + tureurl);
   } else {
-    // 非微信环境：直接加载
+    // 非微信环境：直接打开原链接（替换iframe方式，直接跳转）
     setTimeout(function() {
       document.querySelector('.container').style.display = 'none';
+      window.location.href = tureurl; // 跳转至原链接
     }, 1500);
-    var html = '<iframe class="content" onload="bindMouseWhee(this)" src="' + tureurl + '"></iframe>';
-    document.writeln(html);
-    console.log('非微信环境，加载链接：' + tureurl);
+    console.log('非微信环境，直接打开原链接：' + tureurl);
   }
 } else {
   console.log("未检测到有效链接");
@@ -145,7 +111,7 @@ if (tureurl.includes("http")) {
 </script>
 
 <script>
-// 处理鼠标滚轮事件（保留原功能）
+// 保留鼠标滚轮事件处理（若后续需要iframe可复用）
 var firefox = navigator.userAgent.indexOf('Firefox') != -1;
 function MouseWheel(e, doc) {
   e.preventDefault && e.preventDefault();
@@ -166,7 +132,7 @@ function bindMouseWhee(ifr) {
       };
     }
   } catch (e) {
-    alert('跨域限制：无法获取iframe滚动事件\n' + e);
+    alert('跨域限制：无法获取iframe内容的滚动事件\n' + e);
   }
 }
 </script>
